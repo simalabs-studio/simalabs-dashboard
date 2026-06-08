@@ -136,7 +136,24 @@ else:
                 try:
                     # Konfigurasi AI Studio
                     genai.configure(api_key=api_key_aktif)
-                    model = genai.GenerativeModel('gemini-pro')
+                    
+                    # SISTEM AUTO-DETECT: Mencari model yang aktif di akun Anda
+                    tersedia = []
+                    for m in genai.list_models():
+                        if 'generateContent' in m.supported_generation_methods:
+                            tersedia.append(m.name)
+                            
+                    if not tersedia:
+                        raise ValueError("Tidak ada model AI yang diizinkan untuk API Key ini.")
+                        
+                    # Pilih model terbaik secara otomatis (Prioritas: Flash)
+                    model_pilihan = tersedia[0]
+                    for m in tersedia:
+                        if 'flash' in m:
+                            model_pilihan = m
+                            break
+                            
+                    model = genai.GenerativeModel(model_pilihan)
                     
                     # Menyusun ringkasan data otomatis (membaca semua kolom yang ada, maksimal 50 baris terakhir)
                     data_ringkas = df_clean.tail(50).to_string()
