@@ -121,20 +121,21 @@ else:
 
         # 🤖 INTEGRASI GEMINI AI STUDIO
         st.subheader("🤖 AI Business Analyst Brief")
-        if not GEMINI_KEY:
-            st.info("Masukkan Gemini API Key Anda di sidebar sebelah kiri untuk memunculkan analisis strategi otomatis dari AI.")
+        
+        # Logika Pintar: Cek Brankas rahasia dulu, kalau kosong baru cek Sidebar
+        api_key_aktif = ""
+        if "GEMINI_API_KEY" in st.secrets:
+            api_key_aktif = st.secrets["GEMINI_API_KEY"]
+        elif GEMINI_KEY:
+            api_key_aktif = GEMINI_KEY
+
+        if not api_key_aktif:
+            st.info("API Key belum terdeteksi. Masukkan di sidebar atau di menu Secrets.")
         else:
             with st.spinner("Gemini AI sedang membaca database Google Sheets Anda dan merancang strategi..."):
                 try:
-                    # Konfigurasi AI Studio (Jalur Otomatis)
-                    # 1. Coba ambil dari st.secrets (jika sudah di-cloud)
-                    # 2. Jika tidak ada, gunakan kunci yang diketik user di sidebar
-                    if "GEMINI_API_KEY" in st.secrets:
-                        api_key = st.secrets["GEMINI_API_KEY"]
-                    else:
-                        api_key = GEMINI_KEY # Mengambil dari input text_input di sidebar
-                    
-                    genai.configure(api_key=api_key)
+                    # Konfigurasi AI Studio
+                    genai.configure(api_key=api_key_aktif)
                     model = genai.GenerativeModel('gemini-1.5-flash')
                     
                     # Menyusun ringkasan data ringkas untuk dibaca AI
@@ -161,7 +162,7 @@ else:
                     </div>
                     """, unsafe_allow_html=True)
                 except Exception as ex:
-                    st.error(f"Gagal memanggil Gemini AI: {ex}")
+                    st.error(f"Gagal memanggil Gemini AI. Pastikan API Key valid. Detail error: {ex}")
 
         # Baris Grafik
         st.markdown("### 📈 Grafik Volume Status Operasional")
