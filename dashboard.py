@@ -136,7 +136,7 @@ else:
                 try:
                     # Konfigurasi AI Studio
                     genai.configure(api_key=api_key_aktif)
-                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    model = genai.GenerativeModel('gemini-pro')
                     
                     # Menyusun ringkasan data otomatis (membaca semua kolom yang ada, maksimal 50 baris terakhir)
                     data_ringkas = df_clean.tail(50).to_string()
