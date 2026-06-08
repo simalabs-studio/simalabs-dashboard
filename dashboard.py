@@ -36,11 +36,16 @@ with st.sidebar:
     st.caption("Google Sheets & AI Integrated")
     st.markdown("---")
     
-    st.info("💡 **Koneksi Langsung**\nPastikan akses Google Sheets Anda sudah diatur ke 'Siapa saja yang memiliki link'.")
+    st.info("💡 **Koneksi Otomatis Aktif**\nJika URL sudah disimpan di Secrets, Anda tidak perlu mengisi kolom di bawah ini lagi.")
     
-    # Input sekarang meminta URL lengkap persis seperti di gambar Anda
+    # Logika Pintar: Ambil URL dari Secrets sebagai nilai default jika ada
+    url_default = ""
+    if "SPREADSHEET_URL" in st.secrets:
+        url_default = st.secrets["SPREADSHEET_URL"]
+        
     input_url = st.text_input(
         "URL Spreadsheet Google:", 
+        value=url_default,
         placeholder="https://docs.google.com/spreadsheets/d/xxx/edit..."
     )
     
@@ -51,12 +56,12 @@ with st.sidebar:
             if "/d/" in input_url and "/edit" in input_url:
                 SPREADSHEET_ID = input_url.split("/d/")[1].split("/edit")[0]
             else:
-                SPREADSHEET_ID = input_url # Jaga-jaga jika user tetap memasukkan ID manual
+                SPREADSHEET_ID = input_url
         except:
             st.error("Format URL tidak valid!")
 
-    # Input API Key Gemini (Bisa dikosongkan jika belum punya)
-    GEMINI_KEY = st.text_input("Gemini API Key (Opsional untuk AI):", type="password", placeholder="AIzaSy...")
+    # Input API Key Gemini (Bisa dikosongkan jika sudah ada di Secrets)
+    GEMINI_KEY = st.text_input("Gemini API Key (Opsional jika sudah di Secrets):", type="password", placeholder="AIzaSy...")
     
     st.markdown("---")
     menu = st.sidebar.radio("Navigasi Menu", ["📊 Overview & AI Brief", "📦 Database Transaksi"])
